@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/HorizonRy/Go_ws/tree/main/src/OfficialTutorial/greetings"
+	"github.com/HorizonRy/Go_ws/OfficialTutorial/greetings"
 )
 
 func main() {
