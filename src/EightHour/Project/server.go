@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"sync"
 )
@@ -43,8 +44,8 @@ func (s *Server) ListenUserMsg() {
 }
 
 // 用户上线广播
-func (s *Server) Broadcast(newOnliner *User, msg string) {
-	sendMsg := "[" + newOnliner.Addr + "]" + newOnliner.Name + ":" + msg
+func (s *Server) Broadcast(sender *User, msg string) {
+	sendMsg := "[" + sender.Addr + "]" + sender.Name + ":" + msg
 
 	s.broadcastMsgChan <- sendMsg
 }
@@ -61,6 +62,28 @@ func (s *Server) Handler(conn net.Conn) {
 
 	// 广播上线消息
 	s.Broadcast(user, "已上线")
+
+	// 接收用户发送的消息
+	go func() {
+		buf := make([]byte, 4096)
+		for true {
+			n, err := conn.Read(buf)
+
+			if err != nil && err != io.EOF {
+				fmt.Println("conn.Read err:", err)
+				return
+			}
+
+			if n == 0 {
+				s.Broadcast(user, "已下线")
+				return
+			}
+
+			// 提取用户消息
+			msg := string(buf[:n-1]) // n - 1 用于去除 \n
+			s.Broadcast(user, msg)
+		}
+	}()
 
 	// 当前 handler 阻塞，并创建监听用户消息的 Goroutine
 	select {}
