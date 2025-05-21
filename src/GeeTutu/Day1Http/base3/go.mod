@@ -1,6 +1,6 @@
-module GeeTutu/myHttp/base3
+module GeeTutu/Day1Http/base3
 
-go 1.24.2
+go 1.24.0
 
 require gee v0.0.0
 
